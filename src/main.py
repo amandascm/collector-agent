@@ -95,6 +95,9 @@ class World:
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         quit()
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
 
             # moving agent
             action = self.agent.next_action(self.food_position)
