@@ -46,6 +46,15 @@ class Agent:
         else:
             self.score += 1
             return None
+        
+        if self.direction == Direction.UP:
+            self.position[1] -= 10
+        if self.direction == Direction.DOWN:
+            self.position[1] += 10
+        if self.direction == Direction.LEFT:
+            self.position[0] -= 10
+        if self.direction == Direction.RIGHT:
+            self.position[0] += 10
 
         return self.direction
 
@@ -87,17 +96,9 @@ class World:
                         pygame.quit()
                         quit()
 
-            direction = self.agent.next_action(self.food_position)
             # moving agent
-            if direction == Direction.UP:
-                self.agent.position[1] -= 10
-            if direction == Direction.DOWN:
-                self.agent.position[1] += 10
-            if direction == Direction.LEFT:
-                self.agent.position[0] -= 10
-            if direction == Direction.RIGHT:
-                self.agent.position[0] += 10
-            if direction == None:
+            action = self.agent.next_action(self.food_position)
+            if action == None:
                 self.new_food()
             
             # draw background
