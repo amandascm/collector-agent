@@ -56,12 +56,19 @@ class World:
     def new_food(self):
         self.food_position = vec(random.randrange(1, (self.window["width"])),
                         random.randrange(1, (self.window["height"])))
-
-    def show_score(self, color, font, size):
-        score_font = pygame.font.SysFont(font, size)
-        score_surface = score_font.render('Score: ' + str(self.agent.score), True, color)
-        score_rect = score_surface.get_rect()
-        self.environment_window.blit(score_surface, score_rect)
+    
+    def show_caption(self, color, font, size, text, minimum_y):
+        caption_font = pygame.font.SysFont(font, size)
+        caption_surface = caption_font.render(text, True, color)
+        caption_rect = caption_surface.get_rect()
+        caption_rect.y = minimum_y
+        self.environment_window.blit(caption_surface, caption_rect)
+    
+    def show_captions(self, captions):
+        minimum_y = 0
+        for c in captions:
+            self.show_caption(c["color"], c["font"], c["size"], c["text"], minimum_y)
+            minimum_y += c["size"]
     
     def loop(self):
         while True:        
@@ -92,8 +99,13 @@ class World:
             pygame.draw.rect(self.environment_window, color.RED, pygame.Rect(
                 self.food_position[0], self.food_position[1], 10, 10))
             
-            # displaying score countinuously
-            self.show_score(color.WHITE, 'times new roman', 20)
+            # displaying captions countinuously
+            captions = [
+                {"color":color.WHITE, "font":"times new roman", "size":15, "text": 'Score: ' + str(self.agent.score)},
+                {"color":self.agent.color, "font":"times new roman", "size":15, "text": 'Agent position: ' + str(self.agent.position)},
+                {"color":color.RED, "font":"times new roman", "size":15, "text": 'Food position: ' + str(self.food_position)}
+            ]
+            self.show_captions(captions)
             
             # Refresh game screen
             pygame.display.update()
