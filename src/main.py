@@ -2,6 +2,9 @@ from enum import Enum
 from xmlrpc.client import Boolean
 import pygame
 import random
+import numpy as np
+# Vector2
+vec = pygame.math.Vector2
  
 # colors
 class Color:
@@ -13,50 +16,24 @@ class Color:
         self.BLUE = pygame.Color(0, 0, 255)
 color = Color()
 
-# directions
-class Direction(Enum):
-    RIGHT = 0
-    UP = 1
-    LEFT = 2
-    DOWN = 3
-
 class Agent:
-    def __init__(self, speed=20, color=color.GREEN, default_position=[0,0]) -> None:
+    def __init__(self, speed=18, color=color.GREEN, default_position=vec(0,0)) -> None:
         self.speed = speed
         self.color = color
         self.default_position = default_position
-        self.position = self.default_position
-        self.direction:Direction = Direction.RIGHT
+        self.position:vec = self.default_position
         self.score = 0
 
-    def next_action(self, goal_position):
-        x_diff = self.position[0] - goal_position[0]
-        y_diff = self.position[1] - goal_position[1]
-
-        if x_diff != 0:
-            if x_diff > 0:
-                self.direction = Direction.LEFT
-            else:
-                self.direction = Direction.RIGHT
-        elif y_diff != 0:
-            if y_diff > 0:
-                self.direction = Direction.UP
-            else:
-                self.direction = Direction.DOWN
-        else:
+    def next_action(self, goal_position:vec):
+        diff_vec = goal_position - self.position
+        dist = self.position.distance_to(goal_position)
+        if dist <= 14.15:
             self.score += 1
             return None
-        
-        if self.direction == Direction.UP:
-            self.position[1] -= 10
-        if self.direction == Direction.DOWN:
-            self.position[1] += 10
-        if self.direction == Direction.LEFT:
-            self.position[0] -= 10
-        if self.direction == Direction.RIGHT:
-            self.position[0] += 10
-
-        return self.direction
+        else:
+            factor = dist/self.speed
+            self.position += diff_vec/factor
+        return True
 
 class World:
     def __init__(self) -> None:
@@ -77,8 +54,8 @@ class World:
         self.fps = pygame.time.Clock()
 
     def new_food(self):
-        self.food_position = [random.randrange(1, (self.window["width"]//10)) * 10,
-                        random.randrange(1, (self.window["height"]//10)) * 10]
+        self.food_position = vec(random.randrange(1, (self.window["width"])),
+                        random.randrange(1, (self.window["height"])))
 
     def show_score(self, color, font, size):
         score_font = pygame.font.SysFont(font, size)
